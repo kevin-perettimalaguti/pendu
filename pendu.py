@@ -1,4 +1,4 @@
-import pygame
+import pygame 
 
 surf = pygame.display.set_mode((800,600))
 run = True
