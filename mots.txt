@@ -1,4 +1,21 @@
-liste_mot = ["girafe", "eclipse", "pamplemousse", "zephyr", "sphyx", "galaxie",
- "trampoline", "melancolie", "ruby", "camembert", "ecran", "ordinateur", 
- "postite", "poster", "peinture", "gourde", "vitre", "lumiere", "pouvoir", 
- "economie", "smartphone"]
+girafe
+eclipse
+pamplemousse
+zephyr
+sphyx
+galaxie
+trampoline
+melancolie
+ruby
+camembert
+ecran
+ordinateur
+postite
+poster
+peinture
+gourde
+vitre
+lumiere
+pouvoir
+economie
+smartphone
