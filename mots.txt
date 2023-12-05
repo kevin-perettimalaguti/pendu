@@ -19,3 +19,8 @@ lumiere
 pouvoir
 economie
 smartphoneastronaute
+banane
+astronaute
+chargeur
+l'ardoise
+ventilateur
