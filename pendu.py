@@ -34,7 +34,8 @@ texte_presentation = "Que voulez faire ?"
 
 # Fonction pour afficher le mot dans la fenêtre
 def afficher_mot():
-    x, y = largeur // 2 - 15 * len(mot_affiche), hauteur // 2 - 40  # Ajuster le décalage initial
+    x = largeur // 2 - (15 * len(mot_affiche))  # Ajuster le décalage initial
+    y = hauteur - 120  # Positionner les lettres en bas de l'écran
     espacement_entre_lettres = 5
 
     for lettre in mot_affiche:
@@ -50,7 +51,6 @@ def afficher_menu(selectionner_option):
 
     options = ["Jouer", "Ajouter un mot", "Quitter"]
     for i, option in enumerate(options):
-        
         if i == selectionner_option:
             couleur = red              
         else:
@@ -60,10 +60,87 @@ def afficher_menu(selectionner_option):
 
     pygame.display.flip()
 
+# Fonction pour ajouter un mot
+def ajouter_mot():
+    ecran_de_jeu.fill(grey)
+    affichage_texte = police_menu.render("Ajouter un nouveau mot :", True, red)
+    ecran_de_jeu.blit(affichage_texte, (largeur // 2 - affichage_texte.get_width() // 2, hauteur // 2 - 50))
+    pygame.display.flip()
+
+    nouveau_mot = ""
+    ajout_termine = False
+
+    while not ajout_termine:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()                
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    ajout_termine = True
+                elif event.key == pygame.K_BACKSPACE:
+                    nouveau_mot = nouveau_mot[:-1]
+                elif event.unicode.isalpha():
+                    nouveau_mot += event.unicode
+
+        affichage_nouveau_mot = police_menu.render(nouveau_mot, True, red)
+        ecran_de_jeu.blit(affichage_nouveau_mot, (largeur // 2 - affichage_nouveau_mot.get_width() // 2, hauteur // 2 + 50))
+        pygame.display.flip()
+
+    with open("mots.txt", 'a') as fichier:
+        fichier.write(nouveau_mot + "\n")
+    print("Mot ajouté avec succès !")
+    
+#Fonction pour dessiner le pendu au fur et à mesure des erreur
+def dessiner_pendu(erreurs):
+    pygame.draw.line(ecran_de_jeu, black, (600, 50), (600, 300), 5)  # Support vertical
+    pygame.draw.line(ecran_de_jeu, black, (600, 50), (450, 50), 5)   # Support horizontal
+    
+    if erreurs == 0:
+        return
+    elif erreurs == 1:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+    elif erreurs == 2:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+    elif erreurs == 3:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
+    elif erreurs == 4:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
+    elif erreurs == 5:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, (500, 250), (450, 200), 5)  # Jambe gauche
+    elif erreurs == 6:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, (500, 250), (450, 200), 5)  # Jambe gauche
+        pygame.draw.line(ecran_de_jeu, black, (400, 250), (450, 200), 5)  # Jambe droite
+    elif erreurs == 7:
+        pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
+        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, (500, 250), (450, 200), 5)  # Jambe gauche
+        pygame.draw.line(ecran_de_jeu, black, (400, 250), (450, 200), 5)  # Jambe droite
+        pygame.draw.line(ecran_de_jeu, black, (450, 250), (500, 200), 5)  # Pied gauche
+    elif erreurs > 7:
+        pygame.quit()
+
+                    
+
 # Boucle principale
 en_jeu = False
-erreur = 0
 selected_option = 0
+erreur = 0
 
 while True:
     for event in pygame.event.get():
@@ -75,24 +152,19 @@ while True:
             elif event.key == pygame.K_DOWN:
                 selected_option = (selected_option + 1) % 3
             elif event.key == pygame.K_RETURN:
-                options = ["Jouer", "Ajouter un mot", "Quitter"]  # Ajout de cette ligne pour définir options
+                options = ["Jouer", "Ajouter un mot", "Quitter"]
                 if options[selected_option] == "Jouer":
                     en_jeu = True
                     ecran_de_jeu.fill(grey)
                     afficher_mot()
                     pygame.display.flip()
                 elif options[selected_option] == "Ajouter un mot":
-                    nouveau_mot = input("Entrez un nouveau mot : ")
-                    with open("mots.txt", 'a') as fichier:
-                        fichier.write(nouveau_mot + "\n")
-                    print("Mot ajouté avec succès !")
+                    ajouter_mot()
                 elif options[selected_option] == "Quitter":
                     pygame.quit()
-                    
 
-    if en_jeu:
-        # Logique du jeu
-        for event in pygame.event.get():
+        if en_jeu == True:
+            # Logique du jeu        
             if event.type == pygame.KEYDOWN:
                 if event.unicode.isalpha():
                     lettre = event.unicode.lower()
@@ -101,13 +173,24 @@ while True:
                         for position, position_lettre in enumerate(mot_random):
                             if position_lettre == lettre:
                                 mot_affiche[position] = lettre
-               
+                            else:
+                                erreur =+ 1
+                                                           
 
-        # Mise à jour de l'affichage du mot
-        ecran_de_jeu.fill(grey)
-        afficher_mot()
-        pygame.display.flip()        
+            # Vérifier si le mot est complété
+                if '_' not in mot_affiche:
+                    en_jeu = False
+                    ecran_de_jeu.fill(grey)
+                    afficher_menu(selected_option)
+                    pygame.display.flip()
+                    
+            # Mise à jour de l'affichage du mot et du dessin 
+            ecran_de_jeu.fill(grey)
+            afficher_mot()
+            dessiner_pendu(erreur)
+            pygame.display.flip()        
 
-    else:
-        afficher_menu(selected_option)
+        else:
+            afficher_menu(selected_option)
+
 

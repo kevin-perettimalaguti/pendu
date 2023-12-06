@@ -22,5 +22,10 @@ smartphoneastronaute
 banane
 astronaute
 chargeur
-l'ardoise
+ardoise
 ventilateur
+unique
+souris
+beignoir
+cartographie
+coquelicot
