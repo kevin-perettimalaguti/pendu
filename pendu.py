@@ -8,12 +8,14 @@ win=pygame.display.set_mode((winWidth,winHeight))
 
 # initialize global variables/constants #
 
-BLACK = (0,0, 0)
+BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255,0, 0)
 GREEN = (0,255,0)
 BLUE = (0,0,255)
 LIGHT_BLUE = (102,255,255)
+PURPLE = (182, 48, 243)
+GREY = (170, 166, 184)
 
 
 police = pygame.font.Font(None, 36)
@@ -35,7 +37,7 @@ def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
-    win.fill(WHITE)
+    win.fill(PURPLE)
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
@@ -96,11 +98,11 @@ def buttonHit(x, y):
 
 def end(winner=False):
     global limbs
-    lostTxt = 'You Lost'
-    winTxt = 'WINNER!'
+    lostTxt = 'Tu as Perdu !'
+    winTxt = 'Victoire!'
     redraw_game_window()
     pygame.time.delay(1000)
-    win.fill(GREEN)
+    win.fill(GREY)
 
     if winner == True:
         label = lost_font.render(winTxt, 1, BLACK)
@@ -108,7 +110,7 @@ def end(winner=False):
         label = lost_font.render(lostTxt, 1, BLACK)
 
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
-    wordWas = lost_font.render('The phrase was: ', 1, BLACK)
+    wordWas = lost_font.render('Le mot était : ', 1, BLACK)
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
     win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
@@ -136,10 +138,6 @@ def reset():
     guessed = []
     word = randomWord()
 
-#MAINLINE
-
-
-# Setup buttons
 increase = round(winWidth / 13)
 for i in range(26):
     if i < 13:
@@ -149,7 +147,7 @@ for i in range(26):
         x = 25 + (increase * (i - 13))
         y = 85
     buttons.append([LIGHT_BLUE, x, y, 20, True, 65 + i])
-    # buttons.append([color, x_pos, y_pos, radius, visible, char])
+     
 
 word = randomWord()
 inPlay = True
@@ -220,7 +218,7 @@ def lettres_choisies(guessed):
     win.blit(guessed_text, (20,winHeight-30))
     
 def jeu_1():   
-    win.fill(BLUE)
+    win.fill(BLACK)
     afficher_texte = police_menu.render("Insérer un mot à deviner :", True, BLUE)
     win.blit(afficher_texte, (winHeight // 2 - afficher_texte.get_width() // 2, winWidth // 2 - 50))
     pygame.display.flip()
@@ -240,8 +238,8 @@ def jeu_1():
                 elif event.unicode.isalpha():
                     new_mot += event.unicode  
 
-        # Efface l'écran avant de redessiner le texte
-        win.fill(WHITE) 
+       
+        win.fill(GREY) 
         afficher_texte = police_menu.render("Insérer un mot à deviner :", True, BLUE)
         win.blit(afficher_texte, (winWidth // 2 - afficher_texte.get_width() // 2, winHeight // 2 - 50))  
         
@@ -256,19 +254,19 @@ def jeu_1():
 
 
 
-# MENU ------------------
+
 
 
 menu = pygame_menu.Menu('Welcome', 700, 480,
                        theme=pygame_menu.themes.THEME_GREEN)
 
-menu.add.text_input('Name :', default='Kevin')
-menu.add.button('Jeux 1: Pendu', jeu_2)
-menu.add.button('Jeux 2: mot', jeu_1)
-menu.add.button('Quit', pygame_menu.events.EXIT)
+menu.add.text_input('Prénom :', default='Kevin')
+menu.add.button('Jouer au Pendu', jeu_2)
+menu.add.button('Ajouter un mot', jeu_1)
+menu.add.button('Quitter', pygame_menu.events.EXIT)
 
 menu.mainloop(win)
 
 pygame.quit()
 
-# always quit pygame when done!
+
