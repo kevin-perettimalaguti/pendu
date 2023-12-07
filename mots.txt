@@ -6,7 +6,6 @@ sphyx
 galaxie
 trampoline
 melancolie
-ruby
 camembert
 ecran
 ordinateur
@@ -35,9 +34,10 @@ marteau
 illumine
 finlande
 barquette
-poemmme
-pomme
+poire
 pomme
 Constitution
 poire
 inserer
+rubis
+edelweiss
