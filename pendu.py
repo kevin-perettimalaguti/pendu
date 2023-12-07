@@ -1,272 +1,290 @@
-# importer module#
-import pygame, random, pygame_menu
+# Importation des modules nécessaires
+import pygame  # Module principal pour le jeu
+import random  # Module pour générer des nombres aléatoires
+import pygame_menu  # Module pour créer des menus
 
+# Initialisation de Pygame
 pygame.init()
-winHeight = 480
-winWidth = 700
-win=pygame.display.set_mode((winWidth,winHeight))
 
-# initialize global variables/constants #
+# Dimensions de la fenêtre
+fenetre_largeur = 700
+fenetre_hauteur = 480
+fenetre = pygame.display.set_mode((fenetre_largeur, fenetre_hauteur))
 
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-RED = (255,0, 0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-LIGHT_BLUE = (102,255,255)
-PURPLE = (182, 48, 243)
-GREY = (170, 166, 184)
+# Définition de couleurs utilisées dans le jeu
+NOIR = (0, 0, 0)
+BLANC = (255, 255, 255)
+ROUGE = (255, 0, 0)
+VERT = (0, 255, 0)
+BLEU = (0, 0, 255)
+BLEU_CLAIR = (102, 255, 255)
+VIOLET = (182, 48, 243)
+GRIS = (170, 166, 184)
 
-
+# Définition de polices utilisées dans le jeu
 police = pygame.font.Font(None, 36)
 police_menu = pygame.font.Font(None, 50)
 police_option = pygame.font.Font(None, 21)
 
-btn_font = pygame.font.SysFont("arial", 20)
-guess_font = pygame.font.SysFont("monospace", 24)
-lost_font = pygame.font.SysFont('arial', 45)
-word = ''
-buttons = []
-guessed = []
-hangmanPics = [pygame.image.load('img/dessin0.png'), pygame.image.load('img/dessin1.png'), pygame.image.load('img/dessin2.png'), pygame.image.load('img/dessin3.png'), pygame.image.load('img/dessin4.png'), pygame.image.load('img/dessin5.png'), pygame.image.load('img/dessin6.png')]
+# Initialisation des variables globales/constants
+fonte_bouton = pygame.font.SysFont("arial", 20)
+fonte_devine = pygame.font.SysFont("monospace", 24)
+fonte_perdu = pygame.font.SysFont('arial', 45)
 
-limbs = 0
+mot_a_deviner = ''  # Mot à deviner
+boutons = []  # Liste des boutons du clavier
+lettres_devinees = []  # Liste des lettres déjà devinées
+images_pendu = [pygame.image.load('img/dessin0.png'), pygame.image.load('img/dessin1.png'),
+                 pygame.image.load('img/dessin2.png'), pygame.image.load('img/dessin3.png'),
+                 pygame.image.load('img/dessin4.png'), pygame.image.load('img/dessin5.png'),
+                 pygame.image.load('img/dessin6.png')]  # Images pour l'animation du pendu
+
+membres = 0  # Nombre de parties du corps dessinées
 
 
-def redraw_game_window():
-    global guessed
-    global hangmanPics
-    global limbs
-    win.fill(PURPLE)
-    # Buttons
-    for i in range(len(buttons)):
-        if buttons[i][4]:
-            pygame.draw.circle(win, BLACK, (buttons[i][1], buttons[i][2]), buttons[i][3])
-            pygame.draw.circle(win, buttons[i][0], (buttons[i][1], buttons[i][2]), buttons[i][3] - 2
-                               )
-            label = btn_font.render(chr(buttons[i][5]), 1, BLACK)
-            win.blit(label, (buttons[i][1] - (label.get_width() / 2), buttons[i][2] - (label.get_height() / 2)))
+# Fonction pour redessiner la fenêtre du jeu
+def redessiner_fenetre():
+    global lettres_devinees
+    global images_pendu
+    global membres
+    fenetre.fill(VIOLET)
 
-    spaced = spacedOut(word, guessed)
-    label1 = guess_font.render(spaced, 1, BLACK)
+    # Dessiner les boutons du clavier
+    for i in range(len(boutons)):
+        if boutons[i][4]:
+            pygame.draw.circle(fenetre, NOIR, (boutons[i][1], boutons[i][2]), boutons[i][3])
+            pygame.draw.circle(fenetre, boutons[i][0], (boutons[i][1], boutons[i][2]), boutons[i][3] - 2)
+            label = fonte_bouton.render(chr(boutons[i][5]), 1, NOIR)
+            fenetre.blit(label, (boutons[i][1] - (label.get_width() / 2), boutons[i][2] - (label.get_height() / 2)))
+
+    # Afficher le mot avec les espaces et lettres devinées
+    mot_espaces = mot_espace(mot_a_deviner, lettres_devinees)
+    label1 = fonte_devine.render(mot_espaces, 1, NOIR)
     rect = label1.get_rect()
-    length = rect[2]
-    
-    win.blit(label1,(winWidth/2 - length/2, 400))
+    longueur = rect[2]
 
-    pic = hangmanPics[limbs]
-    win.blit(pic, (winWidth/2 - pic.get_width()/2 + 20, 150))
+    fenetre.blit(label1, (fenetre_largeur / 2 - longueur / 2, 400))
+
+    # Afficher l'image du pendu
+    image = images_pendu[membres]
+    fenetre.blit(image, (fenetre_largeur / 2 - image.get_width() / 2 + 20, 150))
     pygame.display.update()
 
 
-def randomWord():
-    file = open('mots.txt')
-    f = file.readlines()
-    i = random.randrange(0, len(f) - 1)
+# Fonction pour choisir un mot aléatoire dans un fichier
+def mot_aleatoire():
+    with open('mots.txt') as fichier:
+        lignes = fichier.readlines()
+    i = random.randrange(0, len(lignes) - 1)
+    return lignes[i].strip()
 
-    return f[i][:-1]
+
+# Fonction pour vérifier si une lettre fait partie du mot à deviner
+def pendu(lettre):
+    global mot_a_deviner
+    return lettre.lower() not in mot_a_deviner.lower()
 
 
-def hang(guess):
-    global word
-    if guess.lower() not in word.lower():
-        return True
-    else:
-        return False
+# Fonction pour afficher le mot avec les espaces et lettres devinées
+def mot_espace(mot, lettres_devinees=[]):
+    mot_esp = ''
+    for x in range(len(mot)):
+        if mot[x] != ' ':
+            mot_esp += '_ '
+            for lettre_devinee in lettres_devinees:
+                if mot[x].upper() == lettre_devinee:
+                    mot_esp = mot_esp[:-2]
+                    mot_esp += mot[x].upper() + ' '
+        elif mot[x] == ' ':
+            mot_esp += ' '
+    return mot_esp
 
-def spacedOut(word, guessed=[]):
-    spacedWord = ''
-    guessedLetters = guessed
-    for x in range(len(word)):
-        if word[x] != ' ':
-            spacedWord += '_ '
-            for i in range(len(guessedLetters)):
-                if word[x].upper() == guessedLetters[i]:
-                    spacedWord = spacedWord[:-2]
-                    spacedWord += word[x].upper() + ' '
-        elif word[x] == ' ':
-            spacedWord += ' '
-    return spacedWord
-            
 
-def buttonHit(x, y):
-    for i in range(len(buttons)):
-        if x < buttons[i][1] + 20 and x > buttons[i][1] - 20:
-            if y < buttons[i][2] + 20 and y > buttons[i][2] - 20:
-                return buttons[i][5]
+# Fonction pour détecter si un bouton du clavier est cliqué
+def bouton_touche(x, y):
+    for i in range(len(boutons)):
+        if x < boutons[i][1] + 20 and x > boutons[i][1] - 20:
+            if y < boutons[i][2] + 20 and y > boutons[i][2] - 20:
+                return boutons[i][5]
     return None
 
-def end(winner=False):
-    global limbs
-    lostTxt = 'Tu as Perdu !'
-    winTxt = 'Victoire!'
-    redraw_game_window()
+
+# Fonction pour gérer la fin de la partie (victoire ou défaite)
+def fin(partie_gagnee=False):
+    global membres
+    perdu_txt = 'Tu as Perdu !'
+    gagne_txt = 'Victoire!'
+    redessiner_fenetre()
     pygame.time.delay(1000)
-    win.fill(GREY)
+    fenetre.fill(GRIS)
 
-    if winner == True:
-        label = lost_font.render(winTxt, 1, BLACK)
+    if partie_gagnee:
+        label = fonte_perdu.render(gagne_txt, 1, NOIR)
     else:
-        label = lost_font.render(lostTxt, 1, BLACK)
+        label = fonte_perdu.render(perdu_txt, 1, NOIR)
 
-    wordTxt = lost_font.render(word.upper(), 1, BLACK)
-    wordWas = lost_font.render('Le mot était : ', 1, BLACK)
+    mot_txt = fonte_perdu.render(mot_a_deviner.upper(), 1, NOIR)
+    mot_etait = fonte_perdu.render('Le mot était : ', 1, NOIR)
 
-    win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
-    win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
-    win.blit(label, (winWidth / 2 - label.get_width() / 2, 140))
+    fenetre.blit(mot_txt, (fenetre_largeur / 2 - mot_txt.get_width() / 2, 295))
+    fenetre.blit(mot_etait, (fenetre_largeur / 2 - mot_etait.get_width() / 2, 245))
+    fenetre.blit(label, (fenetre_largeur / 2 - label.get_width() / 2, 140))
     pygame.display.update()
-    again = True
-    while again:
+    encore = True
+    while encore:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
-                again = False
-    reset()
+                encore = False
+    reinitialiser()
 
 
-def reset():
-    global limbs
-    global guessed
-    global buttons
-    global word
-    for i in range(len(buttons)):
-        buttons[i][4] = True
+# Fonction pour réinitialiser les variables de jeu
+def reinitialiser():
+    global membres
+    global lettres_devinees
+    global boutons
+    global mot_a_deviner
+    for i in range(len(boutons)):
+        boutons[i][4] = True
 
-    limbs = 0
-    guessed = []
-    word = randomWord()
+    membres = 0
+    lettres_devinees = []
+    mot_a_deviner = mot_aleatoire()
 
-increase = round(winWidth / 13)
+
+# Création des boutons du clavier
+augmenter = round(fenetre_largeur / 13)
 for i in range(26):
     if i < 13:
         y = 40
-        x = 25 + (increase * i)
+        x = 25 + (augmenter * i)
     else:
-        x = 25 + (increase * (i - 13))
+        x = 25 + (augmenter * (i - 13))
         y = 85
-    buttons.append([LIGHT_BLUE, x, y, 20, True, 65 + i])
-     
+    boutons.append([BLEU_CLAIR, x, y, 20, True, 65 + i])
 
-word = randomWord()
-inPlay = True
+# Sélection d'un mot aléatoire pour la partie
+mot_a_deviner = mot_aleatoire()
+en_jeu = True
 
-while inPlay:
-    redraw_game_window()
+# Boucle principale du jeu
+while en_jeu:
+    redessiner_fenetre()
     pygame.time.delay(10)
 
+    # Gestion des événements (clavier, souris, etc.)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            inPlay = False
+            en_jeu = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                inPlay = False
+                en_jeu = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            clickPos = pygame.mouse.get_pos()
-            letter = buttonHit(clickPos[0], clickPos[1])
-            if letter != None:
-                guessed.append(chr(letter))
-                buttons[letter - 65][4] = False
-                if hang(chr(letter)):
-                    if limbs != 5:
-                        limbs += 1
+            pos_clic = pygame.mouse.get_pos()
+            lettre = bouton_touche(pos_clic[0], pos_clic[1])
+            if lettre is not None:
+                lettres_devinees.append(chr(lettre))
+                boutons[lettre - 65][4] = False
+                if pendu(chr(lettre)):
+                    if membres != 5:
+                        membres += 1
                     else:
-                        end()
+                        fin()
                 else:
-                    print(spacedOut(word, guessed))
-                    if spacedOut(word, guessed).count('_') == 0:
-                        end(True)                      
-                        
+                    print(mot_espace(mot_a_deviner, lettres_devinees))
+                    if mot_espace(mot_a_deviner, lettres_devinees).count('_') == 0:
+                        fin(True)
 
+
+# Définition de la deuxième version du jeu
 def jeu_2():
-    
-    global inPlay, word, guessed, buttons, limbs
-    inPlay = True
-    word = randomWord()
-    reset()
+    global en_jeu, mot_a_deviner, lettres_devinees, boutons, membres
+    en_jeu = True
+    mot_a_deviner = mot_aleatoire()
+    reinitialiser()
 
-    while inPlay:
-        redraw_game_window()
+    while en_jeu:
+        redessiner_fenetre()
         pygame.time.delay(10)
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                inPlay = False
+                en_jeu = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    inPlay = False
+                    en_jeu = False
                 elif pygame.K_a <= event.key <= pygame.K_z:
-                    letter = chr(event.key).upper()
-                    if letter not in guessed:
-                        guessed.append(letter)
-                        for btn in buttons:
-                            if chr(btn[5]) == letter:
+                    lettre = chr(event.key).upper()
+                    if lettre not in lettres_devinees:
+                        lettres_devinees.append(lettre)
+                        for btn in boutons:
+                            if chr(btn[5]) == lettre:
                                 btn[4] = False
-                        if hang(letter):
-                            if limbs != 6:
-                                limbs += 1
+                        if pendu(lettre):
+                            if membres != 6:
+                                membres += 1
                             else:
-                                end()
+                                fin()
                         else:
-                            if spacedOut(word, guessed).count('_') == 0:
-                                end(True)
+                            if mot_espace(mot_a_deviner, lettres_devinees).count('_') == 0:
+                                fin(True)
 
-def lettres_choisies(guessed):
-    guessed_letters_text = 'Lettres déja proposées : ' + ', '.join(guessed)
-    guessed_text = police_menu.render(guessed_letters_text, True, BLUE)
-    win.blit(guessed_text, (20,winHeight-30))
-    
-def jeu_1():   
-    win.fill(BLACK)
-    afficher_texte = police_menu.render("Insérer un mot à deviner :", True, BLUE)
-    win.blit(afficher_texte, (winHeight // 2 - afficher_texte.get_width() // 2, winWidth // 2 - 50))
+
+# Fonction pour afficher les lettres déjà proposées
+def lettres_proposees(lettres_devinees):
+    lettres_proposees_texte = 'Lettres déjà proposées : ' + ', '.join(lettres_devinees)
+    texte_proposees = police_menu.render(lettres_proposees_texte, True, BLEU)
+    fenetre.blit(texte_proposees, (20, fenetre_hauteur - 30))
+
+
+# Fonction pour la première version du jeu
+def jeu_1():
+    fenetre.fill(NOIR)
+    afficher_texte = police_menu.render("Insérer un mot à deviner :", True, BLEU)
+    fenetre.blit(afficher_texte, (fenetre_largeur // 2 - afficher_texte.get_width() // 2, fenetre_hauteur // 2 - 50))
     pygame.display.flip()
 
-    new_mot = ""
+    nouveau_mot = ""
     ajout_termine = False
 
     while not ajout_termine:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()                
+                pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     ajout_termine = True
                 elif event.key == pygame.K_BACKSPACE:
-                    new_mot = new_mot[:-1]
+                    nouveau_mot = nouveau_mot[:-1]
                 elif event.unicode.isalpha():
-                    new_mot += event.unicode  
+                    nouveau_mot += event.unicode
 
-       
-        win.fill(GREY) 
-        afficher_texte = police_menu.render("Insérer un mot à deviner :", True, BLUE)
-        win.blit(afficher_texte, (winWidth // 2 - afficher_texte.get_width() // 2, winHeight // 2 - 50))  
-        
-        afficher_new_mot = police_menu.render(new_mot, True, BLUE)
-        text_x = winWidth // 2 - afficher_new_mot.get_width() // 2
-        text_y = winHeight // 2 - afficher_new_mot.get_height() // 2
-        win.blit(afficher_new_mot, (text_x, text_y))
+        fenetre.fill(GRIS)
+        afficher_texte = police_menu.render("Insérer un mot à deviner :", True, BLEU)
+        fenetre.blit(afficher_texte, (fenetre_largeur // 2 - afficher_texte.get_width() // 2, fenetre_hauteur // 2 - 50))
+
+        afficher_nouveau_mot = police_menu.render(nouveau_mot, True, BLEU)
+        text_x = fenetre_largeur // 2 - afficher_nouveau_mot.get_width() // 2
+        text_y = fenetre_hauteur // 2 - afficher_nouveau_mot.get_height() // 2
+        fenetre.blit(afficher_nouveau_mot, (text_x, text_y))
         pygame.display.flip()
 
     with open("mots.txt", 'a') as fichier:
-        fichier.write(new_mot.strip () + "\n")
+        fichier.write(nouveau_mot.strip() + "\n")
 
 
-
-
-
-
-menu = pygame_menu.Menu('Welcome', 700, 480,
-                       theme=pygame_menu.themes.THEME_GREEN)
+# Initialisation du menu principal
+menu = pygame_menu.Menu('Welcome', 700, 480, theme=pygame_menu.themes.THEME_GREEN)
 
 menu.add.text_input('Prénom :', default='Kevin')
 menu.add.button('Jouer au Pendu', jeu_2)
 menu.add.button('Ajouter un mot', jeu_1)
 menu.add.button('Quitter', pygame_menu.events.EXIT)
 
-menu.mainloop(win)
+# Lancement du menu
+menu.mainloop(fenetre)
 
+# Fermeture de Pygame
 pygame.quit()
-
-
