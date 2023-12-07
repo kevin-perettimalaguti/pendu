@@ -29,3 +29,8 @@ souris
 beignoir
 cartographie
 coquelicot
+huitre
+ampoule
+marteau
+illumine
+finlande

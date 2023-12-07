@@ -60,7 +60,7 @@ def afficher_menu(selectionner_option):
 
     pygame.display.flip()
 
-# Fonction pour ajouter un mot
+# Fonction pour ajouter un mot dans le fichier 'mots.txt'
 def ajouter_mot():
     ecran_de_jeu.fill(grey)
     affichage_texte = police_menu.render("Ajouter un nouveau mot :", True, red)
@@ -69,11 +69,12 @@ def ajouter_mot():
 
     nouveau_mot = ""
     ajout_termine = False
+    espacement_entre_lettres = 5  # Ajustez cette valeur selon votre préférence
 
     while not ajout_termine:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()                
+                pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     ajout_termine = True
@@ -82,9 +83,21 @@ def ajouter_mot():
                 elif event.unicode.isalpha():
                     nouveau_mot += event.unicode
 
+        ecran_de_jeu.fill(grey)  # Efface l'écran avec la couleur d'arrière-plan
+
+        affichage_texte = police_menu.render("Ajouter un nouveau mot :", True, red)
+        ecran_de_jeu.blit(affichage_texte, (largeur // 2 - affichage_texte.get_width() // 2, hauteur // 2 - 50))
+
         affichage_nouveau_mot = police_menu.render(nouveau_mot, True, red)
-        ecran_de_jeu.blit(affichage_nouveau_mot, (largeur // 2 - affichage_nouveau_mot.get_width() // 2, hauteur // 2 + 50))
+        x = largeur // 2 - (affichage_nouveau_mot.get_width() + (len(nouveau_mot) - 1) * espacement_entre_lettres) // 2
+        y = hauteur // 2 + 50
+        for lettre in nouveau_mot:
+            affichage_lettre = police_menu.render(lettre, True, red)
+            ecran_de_jeu.blit(affichage_lettre, (x, y))
+            x += affichage_lettre.get_width() + espacement_entre_lettres
+
         pygame.display.flip()
+
 
     with open("mots.txt", 'a') as fichier:
         fichier.write(nouveau_mot + "\n")
@@ -101,41 +114,40 @@ def dessiner_pendu(erreurs):
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
     elif erreurs == 2:
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
-        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 200), (450, 50), 5)  # Corps
     elif erreurs == 3:
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
-        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (500, 140), 5)  # Bras gauche
     elif erreurs == 4:
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
-        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (400, 140), 5)  # Bras droit
     elif erreurs == 5:
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
-        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
-        pygame.draw.line(ecran_de_jeu, black, (500, 250), (450, 200), 5)  # Jambe gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(500, 250), (450, 200), 5)  # Jambe gauche
     elif erreurs == 6:
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
-        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
-        pygame.draw.line(ecran_de_jeu, black, (500, 250), (450, 200), 5)  # Jambe gauche
-        pygame.draw.line(ecran_de_jeu, black, (400, 250), (450, 200), 5)  # Jambe droite
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(500, 250), (450, 200), 5)  # Jambe gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(400, 250), (450, 200), 5)  # Jambe droite
     elif erreurs == 7:
         pygame.draw.ellipse(ecran_de_jeu, black, pygame.Rect(410, 110, 40, 40))  # Tête
-        pygame.draw.line(ecran_de_jeu, black, (450, 200), (450, 50), 5)  # Corps
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (500, 140), 5)  # Bras gauche
-        pygame.draw.line(ecran_de_jeu, black, (450, 170), (400, 140), 5)  # Bras droit
-        pygame.draw.line(ecran_de_jeu, black, (500, 250), (450, 200), 5)  # Jambe gauche
-        pygame.draw.line(ecran_de_jeu, black, (400, 250), (450, 200), 5)  # Jambe droite
-        pygame.draw.line(ecran_de_jeu, black, (450, 250), (500, 200), 5)  # Pied gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 200), (450, 50), 5)  # Corps
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (500, 140), 5)  # Bras gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 170), (400, 140), 5)  # Bras droit
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(500, 250), (450, 200), 5)  # Jambe gauche
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(400, 250), (450, 200), 5)  # Jambe droite
+        pygame.draw.line(ecran_de_jeu, black, pygame.Rect(450, 250), (500, 200), 5)  # Pied gauche
     elif erreurs > 7:
-        pygame.quit()
-
-                    
+        afficher_menu(selected_option)
+                         
 
 # Boucle principale
 en_jeu = False
