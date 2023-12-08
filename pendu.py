@@ -112,16 +112,16 @@ def bouton_touche(x, y):
 # Fonction pour gérer la fin de la partie (victoire ou défaite)
 def fin(partie_gagnee=False):
     global membres
-    perdu_txt = 'Tu as Perdu !'
-    gagne_txt = 'Victoire!'
+    perdu_txt = 'Dommage, tu as Perdu :('
+    gagne_txt = 'Bravo ! Tu as Gagné ;)'
     redessiner_fenetre()
     pygame.time.delay(1000)
     fenetre.fill(GRIS)
 
     if partie_gagnee:
-        label = fonte_perdu.render(gagne_txt, 1, NOIR)
+        label = fonte_perdu.render(gagne_txt, 1, VERT)
     else:
-        label = fonte_perdu.render(perdu_txt, 1, NOIR)
+        label = fonte_perdu.render(perdu_txt, 1, ROUGE)
 
     mot_txt = fonte_perdu.render(mot_a_deviner.upper(), 1, NOIR)
     mot_etait = fonte_perdu.render('Le mot était : ', 1, NOIR)
