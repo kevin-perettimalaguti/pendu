@@ -139,66 +139,7 @@ def fin(partie_gagnee=False):
             if event.type == pygame.KEYDOWN:
                 encore = False
     reinitialiser()
-
-
-# Fonction pour réinitialiser les variables de jeu
-def reinitialiser():
-    global membres
-    global lettres_devinees
-    global boutons
-    global mot_a_deviner
-    for i in range(len(boutons)):
-        boutons[i][4] = True
-
-    membres = 0
-    lettres_devinees = []
-    mot_a_deviner = mot_aleatoire()
-
-
-# Création des boutons du clavier
-augmenter = round(fenetre_largeur / 13)
-for i in range(26):
-    if i < 13:
-        y = 40
-        x = 25 + (augmenter * i)
-    else:
-        x = 25 + (augmenter * (i - 13))
-        y = 85
-    boutons.append([BLEU_CLAIR, x, y, 20, True, 65 + i])
-
-# Sélection d'un mot aléatoire pour la partie
-mot_a_deviner = mot_aleatoire()
-en_jeu = True
-
-# Boucle principale du jeu
-while en_jeu:
-    redessiner_fenetre()
-    pygame.time.delay(10)
-
-    # Gestion des événements (clavier, souris, etc.)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            en_jeu = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                en_jeu = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos_clic = pygame.mouse.get_pos()
-            lettre = bouton_touche(pos_clic[0], pos_clic[1])
-            if lettre is not None:
-                lettres_devinees.append(chr(lettre))
-                boutons[lettre - 65][4] = False
-                if pendu(chr(lettre)):
-                    if membres != 5:
-                        membres += 1
-                    else:
-                        fin()
-                else:
-                    print(mot_espace(mot_a_deviner, lettres_devinees))
-                    if mot_espace(mot_a_deviner, lettres_devinees).count('_') == 0:
-                        fin(True)
-
-
+    
 # Définition de la deuxième version du jeu
 def jeu_2():
     global en_jeu, mot_a_deviner, lettres_devinees, boutons, membres
@@ -276,6 +217,35 @@ def jeu_1():
         fichier.write(nouveau_mot.strip() + "\n")
 
 
+# Fonction pour réinitialiser les variables de jeu
+def reinitialiser():
+    global membres
+    global lettres_devinees
+    global boutons
+    global mot_a_deviner
+    for i in range(len(boutons)):
+        boutons[i][4] = True
+
+    membres = 0
+    lettres_devinees = []
+    mot_a_deviner = mot_aleatoire()
+
+
+# Création des boutons du clavier
+augmenter = round(fenetre_largeur / 13)
+for i in range(26):
+    if i < 13:
+        y = 40
+        x = 25 + (augmenter * i)
+    else:
+        x = 25 + (augmenter * (i - 13))
+        y = 85
+    boutons.append([BLEU_CLAIR, x, y, 20, True, 65 + i])
+
+# Sélection d'un mot aléatoire pour la partie
+mot_a_deviner = mot_aleatoire()
+en_jeu = True
+
 # Initialisation du menu principal
 menu = pygame_menu.Menu('Welcome', 700, 480, theme=pygame_menu.themes.THEME_GREEN)
 
@@ -286,6 +256,34 @@ menu.add.button('Quitter', pygame_menu.events.EXIT)
 
 # Lancement du menu
 menu.mainloop(fenetre)
+
+# Boucle principale du jeu
+while en_jeu:
+    redessiner_fenetre()
+    pygame.time.delay(10)
+
+    # Gestion des événements (clavier, souris, etc.)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            en_jeu = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                en_jeu = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos_clic = pygame.mouse.get_pos()
+            lettre = bouton_touche(pos_clic[0], pos_clic[1])
+            if lettre is not None:
+                lettres_devinees.append(chr(lettre))
+                boutons[lettre - 65][4] = False
+                if pendu(chr(lettre)):
+                    if membres != 5:
+                        membres += 1
+                    else:
+                        fin()
+                else:
+                    print(mot_espace(mot_a_deviner, lettres_devinees))
+                    if mot_espace(mot_a_deviner, lettres_devinees).count('_') == 0:
+                        fin(True)
 
 # Fermeture de Pygame
 pygame.quit()
