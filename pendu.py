@@ -10,6 +10,7 @@ pygame.init()
 fenetre_largeur = 700
 fenetre_hauteur = 480
 fenetre = pygame.display.set_mode((fenetre_largeur, fenetre_hauteur))
+pygame.display.set_caption("Jeu du Pendu")
 
 # Définition de couleurs utilisées dans le jeu
 NOIR = (0, 0, 0)
